@@ -1,13 +1,11 @@
-import os
-import requests
-import time
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 from tqdm import tqdm
+import time
+import requests
 
-DISCORD_WEBHOOK_URL = os.getenv("https://discord.com/api/webhooks/1392772509774119003/ymEW8AmnIZ68-L93MOLrT-7uScilBDBgHmGV_0_V2SEgHvUWOdCl9xdETn9UsrLYlidV")
-
+# ✅ Add all users here — cookie only if available
 user_cookie_strings = {
     "Keerthish": "speedoughSession=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7Im5hbWUiOiJrc2QiLCJlbWFpbCI6ImtzZHdvcmsyMDI1QGdtYWlsLmNvbSIsImVtYWlsVmVyaWZpZWQiOm51bGwsImlzX2FjdGl2ZSI6dHJ1ZSwiaXNfc3VwZXJ1c2VyIjpmYWxzZSwiaW1hZ2UiOiJodHRwczovL3NwZWVkb3VnaC5ib3JpbmdhdmF0YXJzLmRldi9hcGkvYXZhdGFyP3ZhcmlhbnQ9YmVhbSZuYW1lPWtzZCZjb2xvcnM9RUZFQUU2LEVFQUYzQSwwMzBFMEYsRUY5RkJDZyw2NUMzQzgmc3F1YXJlIiwicm9sZSI6ImNyZWF0b3IiLCJjcmVhdG9yX2lkIjo1MTg4LCJjcmVhdGVkX2F0IjoiMjAyNS0wNi0xMlQwMTo1NjowMS40NzFaIiwidXBkYXRlZF9hdCI6IjIwMjUtMDYtMTJUMDE6NTY6MzAuNzMyWiIsImlkIjoiNTMzNyIsImZhdm9yaXRlX3JldGFpbGVycyI6W119LCJuYW1lIjoia3NkIiwiZW1haWwiOiJrc2R3b3JrMjAyNUBnbWFpbC5jb20iLCJwaWN0dXJlIjoiaHR0cHM6Ly9zcGVlZG91Z2guYm9yaW5nYXZhdGFycy5kZXYvYXBpL2F2YXRhcj92YXJpYW50PWJlYW0mbmFtZT1rc2QmY29sb3JzPUVGRUFFNixFRUFGM0EsMDMwRTBGLEVGOUZCQ2csNjVDM0M4JnNxdWFyZSIsInN1YiI6IjUzMzciLCJyb2xlIjoiY3JlYXRvciIsImlhdCI6MTc0OTcwNzczNn0.bmhdow3cspTgfM611tdvSeReDLy7H85Q12tzBq_jGa4",
     "Jibin": "speedoughSession=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7Im5hbWUiOiJqc2QiLCJlbWFpbCI6ImpzZHdvcmsyMDI1QGdtYWlsLmNvbSIsImVtYWlsVmVyaWZpZWQiOm51bGwsImlzX2FjdGl2ZSI6dHJ1ZSwiaXNfc3VwZXJ1c2VyIjpmYWxzZSwiaW1hZ2UiOiJodHRwczovL3NwZWVkb3VnaC5ib3JpbmdhdmF0YXJzLmRldi9hcGkvYXZhdGFyP3ZhcmlhbnQ9YmVhbSZuYW1lPUphbWUmY29sb3JzPUVGRUFFNixFRUFGM0EsMDMwRTBGLEVGOUZCQ2csNjVDM0M4JnNxdWFyZSIsInJvbGUiOiJjcmVhdG9yIiwiY3JlYXRvcl9pZCI6NTE4NiwiY3JlYXRlZF9hdCI6IjIwMjUtMDYtMTJUMDE6NDM6MTcuNzEyWiIsInVwZGF0ZWRfYXQiOiIyMDI1LTA2LTEyVDAxOjQ1OjQxLjEzMVoiLCJpZCI6IjUzMzUiLCJmYXZvcml0ZV9yZXRhaWxlcnMiOltdfSwibmFtZSI6ImpzZCIsImVtYWlsIjoianNkd29yazIwMjVAZ21haWwuY29tIiwicGljdHVyZSI6Imh0dHBzOi8vc3BlZWRvdWdoLmJvcmluZ2F2YXRhcnMuZGV2L2FwaS9hdmF0YXI_dmFyaWFudD1iZWFtJm5hbWU9SmFtZSZjb2xvcnM9RUZFQUU2LEVFQUYzQSwwMzBFMEYsRUY5RkJDZyw2NUMzQzgmc3F1YXJlIiwic3ViIjoiNTMzNSIsInJvbGUiOiJjcmVhdG9yIiwiaWF0IjoxNzQ5NzA3NTYxfQ.POf1aOSbvSvgLL8kSa8846xNKnQ86KQ9hzfk2z94L58",
@@ -30,6 +28,7 @@ user_cookie_strings = {
 }
 
 url = "https://speedough.com/serp/earnings/yesterday"
+DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1392772509774119003/ymEW8AmnIZ68-L93MOLrT-7uScilBDBgHmGV_0_V2SEgHvUWOdCl9xdETn9UsrLYlidV"
 
 def cookie_string_to_dict(cookie_str):
     cookies = []
@@ -102,39 +101,53 @@ def get_user_stats(name, cookie_string):
     return stats
 
 def display_stats(name, stats):
-    block = (
-        f"👤 **{name}**\n"
-        f"> Page Loads     : `{stats['Page Loads']}`\n"
-        f"> Click 1        : `{stats['Click 1']}`\n"
-        f"> Click 2        : `{stats['Click 2']}`\n"
-        f"> CTR1           : `{stats['CTR1']}`\n"
-        f"> CTR2           : `{stats['CTR2']}`\n"
-        f"> Full CTR       : `{stats['Full CTR']}`\n"
-        f"> RPC            : `{stats['RPC']}`\n"
-        f"> 💸 Revenue      : `${stats['Total Revenue']}`"
-    )
-    return block
+    print(f"\n👤 {name}")
+    print("-" * 30)
+    print(f"Page Loads     : {stats['Page Loads']}")
+    print(f"Click 1        : {stats['Click 1']}")
+    print(f"Click 2        : {stats['Click 2']}")
+    print(f"CTR1           : {stats['CTR1']}")
+    print(f"CTR2           : {stats['CTR2']}")
+    print(f"Full CTR       : {stats['Full CTR']}")
+    print(f"RPC            : {stats['RPC']}")
+    print(f"Total Revenue  : ${stats['Total Revenue']}")
+    print("-" * 30)
 
 def send_to_discord(message):
-    if DISCORD_WEBHOOK_URL:
-        requests.post(DISCORD_WEBHOOK_URL, json={"content": message})
-    else:
-        print("⚠️ Webhook URL not configured")
+    try:
+        response = requests.post(DISCORD_WEBHOOK_URL, json={"content": message})
+        if response.status_code != 204:
+            print(f"❌ Failed to send to Discord: {response.status_code} {response.text}")
+    except Exception as e:
+        print(f"❌ Error sending to Discord: {e}")
 
 if __name__ == "__main__":
     print("🔄 Fetching Speedough Stats...\n")
     total_revenue = 0.0
-    messages = []
+    discord_message = "**📊 Speedough Daily Stats:**\n"
 
     for name in tqdm(user_cookie_strings.keys(), desc="Progress", unit="user"):
         try:
             stats = get_user_stats(name, user_cookie_strings[name])
-            block = display_stats(name, stats)
-            messages.append(block)
+            display_stats(name, stats)
             revenue = float(stats["Total Revenue"].replace('$', '').replace(',', '') or "0.00")
             total_revenue += revenue
-        except Exception as e:
-            messages.append(f"❌ Failed to fetch {name}: {e}")
 
-    messages.append(f"\n**📈 Total Revenue (All Users):** `${total_revenue:.2f}`")
-    send_to_discord("\n\n".join(messages))
+            discord_message += (
+                f"\n👤 **{name}**\n"
+                f"Page Loads: {stats['Page Loads']}, "
+                f"Click 1: {stats['Click 1']}, "
+                f"Click 2: {stats['Click 2']}, "
+                f"RPC: {stats['RPC']}, "
+                f"Revenue: ${stats['Total Revenue']}\n"
+            )
+        except Exception as e:
+            error_msg = f"❌ Failed to fetch stats for {name}: {e}"
+            print(error_msg)
+            discord_message += f"\n{error_msg}"
+
+    summary = "\n📈 **Total Revenue (All Users)**: ${:.2f}".format(total_revenue)
+    print(summary)
+    discord_message += summary
+
+    send_to_discord(discord_message)
