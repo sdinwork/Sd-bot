@@ -1,25 +1,27 @@
 name: Speedough Bot
 
 on:
-  workflow_dispatch:         # Manual button in GitHub Actions
   schedule:
-    - cron: '45 * * * *'     # ⏱ Every hour at HH:15 IST (which is HH:45 UTC)
+    - cron: '45 18-23 * * *'  # Runs from 12:15 AM to 5:15 AM IST
+    - cron: '45 0-6 * * *'    # Runs from 6:15 AM to 12:15 PM IST
+  workflow_dispatch:
 
 jobs:
-  run-script:
+  run-bot:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repo
+      - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: 3.10
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-      - name: Run script
+      - name: Run bot
         run: python main.py
