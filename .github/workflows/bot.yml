@@ -2,13 +2,13 @@ name: Speedough Bot
 
 on:
   schedule:
-    - cron: '45 18-23 * * *'  # Runs from 12:15 AM to 5:15 AM IST
-    - cron: '45 0-6 * * *'    # Runs from 6:15 AM to 12:15 PM IST
-  workflow_dispatch:
+    - cron: '*/5 * * * *'  # ⏱️ Every 5 minutes (UTC)
+  workflow_dispatch:        # 🧑‍💻 Manual trigger
 
 jobs:
   run-bot:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
